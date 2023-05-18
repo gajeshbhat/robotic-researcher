@@ -88,7 +88,35 @@ This robot has the ability to infer the field of work of a scientist from the fi
 The robot is equipped to handle common errors that may occur during web scraping. For example, if the robot fails to retrieve a piece of information, it will handle the exception gracefully and continue with the operation.
 
 ## Profiling and Benchmarking
+1. I have added a profiling file profile_robot.py to profile the Robot class.
+2. I used the `line profiler` package to profile the two different implementations for S-expression evaluation. You can install it by running `pip install line_profiler` or by running pip install -r requirements.txt
+3. Below are the results from the test runs I did. This further helps us pin point the performance bottleneck in the code.
 
+```
+Total time: 14.3133 s
+File: /Users/gajesh/git/robotic_researcher/profile_robot.py
+Function: profile_small_input at line 59
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    59                                           def profile_small_input():
+    60         1 2639477000.0 2639477000.0     18.4      robot = Robot("Quandrinaut", scientists=scientist_small, summary_prediction=False, summary_prediction_model='en_core_web_sm')
+    61         1 11673784000.0 11673784000.0     81.6      scientist_data = robot.get_scientists_summary()
+    62         1      43000.0  43000.0      0.0      print(len(scientist_data))
+
+Total time: 81.1858 s
+File: /Users/gajesh/git/robotic_researcher/profile_robot.py
+Function: profile_medium_input at line 65
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    65                                           def profile_medium_input():
+    66         1 2546859000.0 2546859000.0      3.1      robot = Robot("Quandrinaut", scientists=scientist_large, summary_prediction=False, summary_prediction_model='en_core_web_sm')
+    67         1 78638934000.0 78638934000.0     96.9      scientist_data = robot.get_scientists_summary()
+    68         1      30000.0  30000.0      0.0      print(len(scientist_data))
+```
+
+Run `python profile_robot.py` to run the profiling script.
 
 ## Future Enhancements
 

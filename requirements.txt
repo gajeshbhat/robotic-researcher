@@ -1,3 +1,4 @@
 rpaframework==23.0.0
-beautifulsoup4==4.12.2
-spacy==3.2.1
+bs4
+spacy
+line-profiler==4.0.3
