@@ -201,20 +201,20 @@ class Robot:
         return text
     
     # Helper Functions
-    def ensure_spacy_model_exists(self):
+    def ensure_spacy_model_exists(self) -> None:
         """
         Check if the model exists, if not download and store it.
         """
         if not os.path.exists(self.get_model_path()):
             self.download_and_store_spacy_model()
 
-    def get_model_path(self):
+    def get_model_path(self) -> str:
         """
         Returns the path of the spacy model.
         """
         return os.path.join(os.getcwd(), "models", self.model_name)
 
-    def download_and_store_spacy_model(self):
+    def download_and_store_spacy_model(self) -> None:
         """
         Downloads and stores the spacy model.
         """
@@ -232,7 +232,7 @@ class Robot:
         self._open_webpage(scientist_info_url)
         return BeautifulSoup(self._get_page_source(), "html.parser")
 
-    def _open_webpage(self, webpage: str):
+    def _open_webpage(self, webpage: str) -> None:
         """
         Opens the webpage.
         """
@@ -251,7 +251,7 @@ class Robot:
             print(f"Error while getting page source: {e}")
             return ""
 
-    def close_browser(self):
+    def close_browser(self) -> None:
         """
         Closes the browser.
         """
@@ -263,21 +263,21 @@ class Robot:
 
     # Greetings and Console Output
 
-    def say_hello(self):
+    def say_hello(self) -> None:
         """
         Says hello to the user and explains what the robot does and the steps involved.
         """
         print(f"\nHello, I am {self.name}! I am a robot that can scrape data from Wikipedia for scientists and predict their field of work using their introduction if not available on wikipedia.")
         print("Let's get started!\n")
 
-    def say_goodbye(self):
+    def say_goodbye(self) -> None:
         """
         Says goodbye to the user.
         """
         print(f"\nGoodbye! I hope you liked my work.")
 
     @staticmethod
-    def display_info(scientists):
+    def display_info(scientists) -> None:
         """
         Displays the information of the scientist.
         """
