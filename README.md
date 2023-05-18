@@ -5,12 +5,18 @@ Welcome to the Robotic Researcher project. This project is a software robot desi
 The robot accomplishes this by navigating to each scientist's Wikipedia page, extracting important information, and displaying it in a user-friendly format. It leverages the `rpaframework` library for browser automation and the `bs4` library for web scraping.
 
 ## Installation
+You can create a virtual environment and install the dependencies using the following commands:
+
+```
+python3 -m venv venv
+source venv/bin/activate
+```
 
 Before you run the robot, make sure you have the necessary Python libraries installed:
-
-```bash
-pip install rpaframework bs4 spacy
 ```
+pip install -r requirements.txt
+```
+**Note:** This may take a while as it will install the spacy model as well which can be used to add a lot of features to the robot and work on parsed data. I have included the venv folder as well which has all the dependencies installed. In that case you can just go ahead and enable it using ```source venv/bin/activate``` and run the robot.
 
 ## Execution
 
@@ -125,6 +131,5 @@ There are numerous potential enhancements to this project, such as:
 - Enhancing the Spacy model training for more accurate predictions of a scientist's field of work.
 - Adding multi-threading to scrape data for multiple scientists concurrently.
 - Including more details about scientists, such as their significant contributions or awards received.
-
-## Submission
+- Using spacy model to extract more information from the summary text and creating a knwoledge graph of the scientist.
 
