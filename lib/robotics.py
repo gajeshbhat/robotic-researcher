@@ -2,8 +2,6 @@ from RPA.Browser.Selenium import Selenium
 from bs4 import BeautifulSoup
 from datetime import datetime
 from typing import Optional, List
-from multiprocessing import Pool
-from functools import partial
 import re
 import spacy
 import os
@@ -18,6 +16,13 @@ class Robot:
                  summary_prediction_model: str = "en_core_web_sm",headless: bool = False):
         """
         Initializes the robot with a name and opens a browser.
+        
+        Parameters:
+        name: str - The name of the robot
+        scientists: Optional[List[str]] - A list of scientists to scrape data for. Defaults to a pre-defined list.
+        summary_prediction: bool - Whether or not to use a spacy model to predict the field of work from the scientist's introduction.
+        summary_prediction_model: str - The name of the spacy model to use for predictions. Defaults to "en_core_web_sm".
+        headless: bool - Whether or not to run the browser in headless mode.
         """
         self.name = name
         self.browser = Selenium()
@@ -34,73 +39,6 @@ class Robot:
             self.model_name = self.summary_prediction_model
             self.ensure_spacy_model_exists()
             self.nlp = spacy.load(self.get_model_path())
-
-    def ensure_spacy_model_exists(self):
-        """
-        Check if the model exists, if not download and store it.
-        """
-        if not os.path.exists(self.get_model_path()):
-            self.download_and_store_spacy_model()
-
-    def get_model_path(self):
-        """
-        Returns the path of the spacy model.
-        """
-        return os.path.join(os.getcwd(), "models", self.model_name)
-
-    def download_and_store_spacy_model(self):
-        """
-        Downloads and stores the spacy model.
-        """
-        if not os.path.exists(os.path.join(os.getcwd(), "models")):
-            os.makedirs(os.path.join(os.getcwd(), "models/{self.model_name}}/"), exist_ok=True)
-        spacy.cli.download(self.model_name)
-        nlp = spacy.load(self.model_name)
-        nlp.to_disk(self.get_model_path())
-
-    def get_scientist_page_soup(self, scientist: str) -> BeautifulSoup:
-        """
-        Fetches the scientist page and returns the parsed BeautifulSoup object.
-        """
-        scientist_info_url = BASE_URL + scientist.replace(' ', '_')
-        self._open_webpage(scientist_info_url)
-        return BeautifulSoup(self._get_page_source(), "html.parser")
-
-    def _open_webpage(self, webpage: str):
-        """
-        Opens the webpage.
-        """
-        try:
-            self.browser.go_to(webpage)
-        except Exception as e:
-            print(f"Error while opening webpage: {e}")
-
-    def _get_page_source(self) -> str:
-        """
-        Returns the page source of the current webpage.
-        """
-        try:
-            return self.browser.get_source()
-        except Exception as e:
-            print(f"Error while getting page source: {e}")
-            return ""
-
-    def close_browser(self):
-        """
-        Closes the browser.
-        """
-        try:
-            self.browser.close_all_browsers()
-        except Exception as e:
-            print(f"Error while closing browser: {e}")
-
-    def clean_text(self, text: str) -> str:
-        """
-        Cleans the text by removing reference tags, extra whitespaces and newline characters.
-        """
-        text = re.sub(r'\[\d+\]', '', text)  # Remove reference tags
-        text = re.sub(r'\s+', ' ', text)  # Remove extra whitespace and newline characters
-        return text.strip()
 
     def get_scientists_summary(self) -> List[dict]:
         """
@@ -127,8 +65,6 @@ class Robot:
                 field_of_work = self.infer_field_of_work(intro) + " (Predicted)"
 
             birthplace = self.get_birthplace(soup)
-
-            self.display_info(scientist, born, died, age, intro, field_of_work, birthplace)
 
             return {
                 'name': scientist,
@@ -264,7 +200,69 @@ class Robot:
         text = re.sub(r'\s+', ' ', text)  # Remove extra whitespace and newline characters
         return text
     
-    # Write a method to say hello and explain to user what the robot does and steps involved
+    # Helper Functions
+    def ensure_spacy_model_exists(self):
+        """
+        Check if the model exists, if not download and store it.
+        """
+        if not os.path.exists(self.get_model_path()):
+            self.download_and_store_spacy_model()
+
+    def get_model_path(self):
+        """
+        Returns the path of the spacy model.
+        """
+        return os.path.join(os.getcwd(), "models", self.model_name)
+
+    def download_and_store_spacy_model(self):
+        """
+        Downloads and stores the spacy model.
+        """
+        if not os.path.exists(os.path.join(os.getcwd(), "models")):
+            os.makedirs(os.path.join(os.getcwd(), "models/{self.model_name}}/"), exist_ok=True)
+        spacy.cli.download(self.model_name)
+        nlp = spacy.load(self.model_name)
+        nlp.to_disk(self.get_model_path())
+
+    def get_scientist_page_soup(self, scientist: str) -> BeautifulSoup:
+        """
+        Fetches the scientist page and returns the parsed BeautifulSoup object.
+        """
+        scientist_info_url = BASE_URL + scientist.replace(' ', '_')
+        self._open_webpage(scientist_info_url)
+        return BeautifulSoup(self._get_page_source(), "html.parser")
+
+    def _open_webpage(self, webpage: str):
+        """
+        Opens the webpage.
+        """
+        try:
+            self.browser.go_to(webpage)
+        except Exception as e:
+            print(f"Error while opening webpage: {e}")
+
+    def _get_page_source(self) -> str:
+        """
+        Returns the page source of the current webpage.
+        """
+        try:
+            return self.browser.get_source()
+        except Exception as e:
+            print(f"Error while getting page source: {e}")
+            return ""
+
+    def close_browser(self):
+        """
+        Closes the browser.
+        """
+        try:
+            self.browser.close_all_browsers()
+        except Exception as e:
+            print(f"Error while closing browser: {e}")
+
+
+    # Greetings and Console Output
+
     def say_hello(self):
         """
         Says hello to the user and explains what the robot does and the steps involved.
@@ -278,15 +276,17 @@ class Robot:
         """
         print(f"\nGoodbye! I hope you liked my work.")
 
-    def display_info(self, name: str, born: str, died: str, age: str, intro: str, field_of_work: str, birthplace: str):
+    @staticmethod
+    def display_info(scientists):
         """
         Displays the information of the scientist.
         """
-        print(f"\n{name}")
-        print(f"Born: {born}")
-        print(f"Died: {died}")
-        print(f"Age: {age}\n")
-        print(f"Introduction: {intro}\n")
-        print(f"Field of work: {field_of_work}")
-        print(f"Birthplace: {birthplace}")
-        print("----------------------------------------\n")
+        for scientist in scientists:
+            print(f"Name\n{scientist['name']}\n")
+            print(f"Born: {scientist['born']}")
+            print(f"Died: {scientist['died']}")
+            print(f"Age: {scientist['age']}\n")
+            print(f"Introduction: {scientist['introduction']}\n")
+            print(f"Field of work: {scientist['field_of_work']}")
+            print(f"Birthplace: {scientist['birthplace']}")
+            print("----------------------------------------\n")

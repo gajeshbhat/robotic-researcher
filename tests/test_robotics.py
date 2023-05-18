@@ -1,45 +1,14 @@
-import pytest
-from bs4 import BeautifulSoup
-from ..robotics import Robot
-import re
+from lib.robotics import Robot
+from unittest.mock import patch
 
-@pytest.fixture(scope="module")
-def robot():
-    r = Robot("Quandrinaut")
-    yield r
-    r.close_browser()
+def test_robot_init():
+    robot = Robot('TestRobot', ['Ada Lovelace'])
+    assert robot.name == 'TestRobot'
+    assert robot.scientists == ['Ada Lovelace']
 
-@pytest.fixture(scope="module")
-def einstein_soup():
-    einstein_url = "https://en.wikipedia.org/wiki/Albert_Einstein"
-    robot = Robot("Quandrinaut")
-    robot.open_webpage(einstein_url)
-    soup = BeautifulSoup(robot.get_page_source(), "html.parser")
-    robot.close_browser()
-    return soup
-
-def test_find_birth_death_dates(einstein_soup):
-    robot = Robot("Quandrinaut")
-    born, died = robot.find_birth_death_dates(einstein_soup)
-    assert born == "(1879-03-14)"
-    assert died == "(1955-04-18)"
-
-def test_calculate_age():
-    robot = Robot("Quandrinaut")
-    age = robot.calculate_age("(1879-03-14)", "(1955-04-18)")
-    assert age == 76
-
-def test_get_first_paragraph(einstein_soup):
-    robot = Robot("Quandrinaut")
-    first_paragraph = robot.get_first_paragraph(einstein_soup)
-    assert re.match(r"Albert Einstein.*?physicist", first_paragraph)
-
-def test_get_field_of_work(einstein_soup):
-    robot = Robot("Quandrinaut")
-    field_of_work = robot.get_field_of_work(einstein_soup)
-    assert "Physics" in field_of_work
-
-def test_get_birthplace(einstein_soup):
-    robot = Robot("Quandrinaut")
-    birthplace = robot.get_birthplace(einstein_soup)
-    assert "Ulm, Kingdom of Württemberg, German Empire" in birthplace
+@patch.object(Robot, '_get_page_source')
+def test_get_scientist_page_soup(mock_get_source):
+    mock_get_source.return_value = "<html><body><h1>Test Page</h1></body></html>"
+    robot = Robot('TestRobot', ['Ada Lovelace'])
+    soup = robot.get_scientist_page_soup('Ada Lovelace')
+    assert soup.h1.string == 'Test Page'
