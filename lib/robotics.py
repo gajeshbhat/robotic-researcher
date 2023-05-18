@@ -282,7 +282,7 @@ class Robot:
         Displays the information of the scientist.
         """
         for scientist in scientists:
-            print(f"Name\n{scientist['name']}\n")
+            print(f"Name: {scientist['name']}\n")
             print(f"Born: {scientist['born']}")
             print(f"Died: {scientist['died']}")
             print(f"Age: {scientist['age']}\n")
