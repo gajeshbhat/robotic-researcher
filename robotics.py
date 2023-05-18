@@ -13,13 +13,13 @@ class Robot:
 
     def __init__(self, name: str, scientists: Optional[List[str]] = None,
                  summary_prediction: bool = False,
-                 summary_prediction_model: str = "en_core_web_sm"):
+                 summary_prediction_model: str = "en_core_web_sm",headless: bool = False):
         """
         Initializes the robot with a name and opens a browser.
         """
         self.name = name
         self.browser = Selenium()
-        self.browser.open_available_browser()
+        self.browser.open_available_browser(headless=headless)
         self.summary_prediction = summary_prediction
         self.summary_prediction_model = summary_prediction_model
     
@@ -83,7 +83,7 @@ class Robot:
             print(f"Error while getting page source: {e}")
             return ""
 
-    def _close_browser(self):
+    def close_browser(self):
         """
         Closes the browser.
         """

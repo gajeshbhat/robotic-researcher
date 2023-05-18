@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scientist Info</title>
+</head>
+<body>
+    <form method="POST">
+        <input type="text" name="scientist" placeholder="Enter Scientist Name" required>
+        <input type="submit" value="Get Info">
+    </form>
+
+    {% if scientist_info %}
+    <div>
+        <h1>{{ scientist_info.name }}</h1>
+        <p>Born: {{ scientist_info.born }}</p>
+        <p>Died: {{ scientist_info.died }}</p>
+        <p>Age: {{ scientist_info.age }}</p>
+        <p>Introduction: {{ scientist_info.introduction }}</p>
+        <p>Field of work: {{ scientist_info.field_of_work }}</p>
+        <p>Birthplace: {{ scientist_info.birthplace }}</p>
+    </div>
+    {% endif %}
+</body>
+</html>
